@@ -5,7 +5,10 @@
   "httpMethod": "POST",
   "isBase64Encoded": false,
   "queryStringParameters": {
-    "foo": "bar"
+    "foo": "bar",
+    "GITHUB_ORG": "myorg",
+    "GITHUB_ACCESS_TOKEN": "xyz",
+    "SINCE": "2018-02-02"
   },
   "pathParameters": {
     "proxy": "/path/to/resource"
