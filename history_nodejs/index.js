@@ -5,15 +5,17 @@ const {URL} = require('url');
 exports.lambda_handler = async function (event, context, callback) {
 
     const queryStringParameters = event["queryStringParameters"] || {};
-    let GITHUB_ORG = queryStringParameters.GITHUB_ORG
+    const GITHUB_ORG = queryStringParameters.GITHUB_ORG
     if (!GITHUB_ORG) {
         return sendErrors(callback, "parameter GITHUB_ORG is missing");
     }
-    let GITHUB_ACCESS_TOKEN = queryStringParameters.GITHUB_ACCESS_TOKEN
+    const GITHUB_ACCESS_TOKEN = queryStringParameters.GITHUB_ACCESS_TOKEN
     if (!GITHUB_ACCESS_TOKEN) {
         return sendErrors(callback, "parameter GITHUB_ACCESS_TOKEN is missing");
     }
-    let timestamp = Date.parse(queryStringParameters.SINCE)
+
+    const SINCE = queryStringParameters.SINCE
+    const timestamp = Date.parse(SINCE)
     if (isNaN(timestamp)) {
         return sendErrors(callback, "parameter SINCE was invalid, should be YYYY-MM-DD");
     }
@@ -23,44 +25,46 @@ exports.lambda_handler = async function (event, context, callback) {
     }
     let repos
     try {
-        repos = await findAllRepos(GITHUB_ORG, GITHUB_ACCESS_TOKEN)
+        repos = await findAllRepos(GITHUB_ORG, GITHUB_ACCESS_TOKEN, SINCE)
     } catch (e) {
         return sendErrors(callback, util.inspect(e));
     }
 
-    let filteredRepos = repos.filter(repo => {
-       return new Date(repo.pushed_at) >= DATE_SINCE;
-    });
-
     callback(null, {
         statusCode: 200,
-        body: {
-            repos: filteredRepos
-        }
+        body: JSON.stringify({
+            total: repos.length,
+            items: repos
+        })
     });
 }
 
 function sendErrors(callback, error) {
     return callback(null, {
         statusCode: 400,
-        body: {
+        body: JSON.stringify({
             error: error
-        }
+        })
     })
 }
 
-async function findAllRepos(org, access_token) {
+async function findAllRepos(org, access_token, since) {
     let repos = [];
-    const max = 100;
+    const maxPerPage = 100;
 
-    async function _find(pageNo) {
-        return findRepos(org, access_token, max, pageNo)
-            .then(pageRepos => {
+    function _find(pageNo) {
+        return findRepos(org, access_token, maxPerPage, pageNo, since)
+            .then(searchResponse => {
+                let pageRepos = searchResponse.items || []
                 repos = repos.concat(pageRepos)
-                if (pageRepos < max) {
-                    return _find(max, pageNo + 1)
-                } else {
+                if (pageRepos.length < maxPerPage || searchResponse.total_count === repos.length) {
                     return repos;
+                } else {
+                    return new Promise(function (resolve, reject) {
+                        setTimeout(function () {
+                            _find(pageNo + 1).then(resolve).catch(reject)
+                        }, 1000);
+                    })
                 }
             })
     }
@@ -68,24 +72,27 @@ async function findAllRepos(org, access_token) {
     return _find(1)
 }
 
-async function findRepos(org, access_token, max, pageNo) {
-    const api = new URL("/orgs/" + org + "/repos", "https://api.github.com");
+async function findRepos(org, access_token, max, pageNo, since) {
+    const api = new URL("/search/repositories", "https://api.github.com");
     api.searchParams.set('access_token', access_token);
     api.searchParams.set('per_page', max);
     api.searchParams.set('page', pageNo);
+    api.searchParams.set('q', 'org:' + org + ' pushed:>=' + since)
 
-    return asyncHttpsGetRequest(api.href)
-        .then(jsonResponse => {
-            if (!Array.isArray(jsonResponse)) {
-                throw new Error("unexpected response:" + JSON.stringify(jsonResponse));
-            }
-            return jsonResponse
-        })
+    return asyncHttpsGetRequest(api);
 }
 
-async function asyncHttpsGetRequest(uri) {
+async function asyncHttpsGetRequest(url) {
+
     return new Promise(function (resolve, reject) {
-        https.get(uri, (resp) => {
+        https.get({
+            host: url.host,
+            path: url.pathname + url.search,
+            headers: {
+                'Accept': 'application/json',
+                'User-Agent': 'Github commit history filter'
+            }
+        }, (resp) => {
             let data = '';
             resp.on('data', (chunk) => {
                 data += chunk;
