@@ -16,6 +16,7 @@ Resources:
       CodeUri: history_nodejs/
       Handler: index.lambda_handler
       Runtime: nodejs8.10
+      Timeout: 10
       Events:
         HistoryNodejs:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
