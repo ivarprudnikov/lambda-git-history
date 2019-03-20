@@ -1,18 +1,5 @@
-# sam-app
-
-This is a sample template for sam-app - Below is a brief explanation of what we have generated for you:
-
-```text
-.
-├── README.md                   <-- This instructions file
-├── sample_history_event.json                  <-- API Gateway Proxy Integration event payload
-├── history_nodejs                 <-- Source code for a lambda function
-│   ├── index.js                  <-- Lambda function code
-├── template.yaml               <-- SAM Template
-└── tests                       <-- Unit tests
-    └── unit
-        └── test_handler.py
-```
+sam-app
+=====================
 
 ## Requirements
 
@@ -107,18 +94,6 @@ In order to delete our Serverless Application recently deployed you can use the 
 ```bash
 aws cloudformation delete-stack --stack-name sam-app
 ```
-
-## Bringing to the next level
-
-* Build the project with ``sam build --use-container``
-* Invoke with ``sam local invoke HelloWorldFunction --event sample_history_event.json``
-* Update tests
-
-### Step-through debugging
-
-* **[Enable step-through debugging docs for supported runtimes]((https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-using-debugging.html))**
-
-Next, you can use AWS Serverless Application Repository to deploy ready to use Apps that go beyond hello world samples and learn how authors developed their applications: [AWS Serverless Application Repository main page](https://aws.amazon.com/serverless/serverlessrepo/)
 
 # Appendix
 
