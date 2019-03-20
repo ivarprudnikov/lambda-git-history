@@ -1,0 +1,33 @@
+{
+  "name": "lambda-git-history",
+  "version": "1.0.0",
+  "description": "AWS Lambda functions for extracting users Github history",
+  "main": "index.js",
+  "directories": {
+    "test": "./tests"
+  },
+  "scripts": {
+    "test": "standard && mocha tests/**/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ivarprudnikov/lambda-git-history.git"
+  },
+  "author": "Aivaras Prudnikovas",
+  "license": "GPLv3",
+  "bugs": {
+    "url": "https://github.com/ivarprudnikov/lambda-git-history/issues"
+  },
+  "homepage": "https://github.com/ivarprudnikov/lambda-git-history",
+  "devDependencies": {
+    "mocha": "^6.0.2",
+    "standard": "^12.0.1"
+  },
+  "standard": {
+    "env": [
+      "node",
+      "mocha",
+      "es6"
+    ]
+  }
+}
