@@ -5,7 +5,7 @@ This is a sample template for sam-app - Below is a brief explanation of what we 
 ```text
 .
 ├── README.md                   <-- This instructions file
-├── event.json                  <-- API Gateway Proxy Integration event payload
+├── sample_history_event.json                  <-- API Gateway Proxy Integration event payload
 ├── history_nodejs                 <-- Source code for a lambda function
 │   ├── index.js                  <-- Lambda function code
 ├── template.yaml               <-- SAM Template
@@ -26,7 +26,7 @@ This is a sample template for sam-app - Below is a brief explanation of what we 
 **Invoking function locally using a local sample payload**
 
 ```bash
-sam local invoke HistoryNodejsFunction --event event.json
+sam local invoke HistoryNodejsFunction --event sample_history_event.json
 ```
 
 **Invoking function locally through local API Gateway**
@@ -111,7 +111,7 @@ aws cloudformation delete-stack --stack-name sam-app
 ## Bringing to the next level
 
 * Build the project with ``sam build --use-container``
-* Invoke with ``sam local invoke HelloWorldFunction --event event.json``
+* Invoke with ``sam local invoke HelloWorldFunction --event sample_history_event.json``
 * Update tests
 
 ### Step-through debugging
